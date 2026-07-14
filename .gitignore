@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtuelle Umgebung
+.venv/
+venv/
+env/
+
+# VS Code
+.vscode/
+
+# Build-Dateien
+build/
+dist/
+
+# PyInstaller
+*.spec
+
+# Log-Dateien
+*.log
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
