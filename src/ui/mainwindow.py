@@ -9,6 +9,9 @@ from PySide6.QtCore import Qt
 
 from src.ui.sidebar import Sidebar
 from src.ui.dashboard import Dashboard
+from src.ui.settings import Settings
+from src.config.config_manager import ConfigManager
+from src.connection.connection_manager import ConnectionManager
 
 
 class MainWindow(QMainWindow):
@@ -23,18 +26,14 @@ class MainWindow(QMainWindow):
 
     def build_ui(self):
 
-        # Zentrales Widget
         central = QWidget()
         self.setCentralWidget(central)
 
-        # Hauptlayout
         layout = QHBoxLayout(central)
 
-        # Sidebar
         self.sidebar = Sidebar()
         self.sidebar.setFixedWidth(220)
 
-        # Seiten
         self.stack = QStackedWidget()
 
         self.dashboard = Dashboard()
@@ -51,10 +50,8 @@ class MainWindow(QMainWindow):
         self.berichte = QLabel("📄 Berichte")
         self.berichte.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.einstellungen = QLabel("⚙ Einstellungen")
-        self.einstellungen.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.einstellungen = Settings()
 
-        # Seiten hinzufügen
         self.stack.addWidget(self.dashboard)
         self.stack.addWidget(self.analyse)
         self.stack.addWidget(self.reparatur)
@@ -62,11 +59,9 @@ class MainWindow(QMainWindow):
         self.stack.addWidget(self.berichte)
         self.stack.addWidget(self.einstellungen)
 
-        # Layout
         layout.addWidget(self.sidebar)
         layout.addWidget(self.stack)
 
-        # Navigation verbinden
         self.sidebar.dashboard.clicked.connect(
             lambda: self.stack.setCurrentIndex(0)
         )
@@ -91,4 +86,32 @@ class MainWindow(QMainWindow):
             lambda: self.stack.setCurrentIndex(5)
         )
 
-        self.statusBar().showMessage("Bereit.")
+        # ----------------------------------
+        # Auto-Connect
+        # ----------------------------------
+
+        config = ConfigManager.load()
+
+        if config.get("auto_connect", False):
+
+            self.statusBar().showMessage(
+                "🟡 Verbinde mit Server..."
+            )
+
+            self.einstellungen.verbinden()
+
+        # ----------------------------------
+        # Statusleiste
+        # ----------------------------------
+
+        if ConnectionManager.is_connected():
+
+            self.statusBar().showMessage(
+                f"🟢 Verbunden | {config['host']}"
+            )
+
+        else:
+
+            self.statusBar().showMessage(
+                "🔴 Nicht verbunden"
+            )
